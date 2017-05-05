@@ -22,7 +22,7 @@ function _search_yamaxun(data){
       books.push(book);
     });
   }
-  return books;
+  return uniqeByKeys(books);
 }
 function _search_dangdang(data){
 
@@ -173,6 +173,36 @@ function gb2utf8(data){
   }
   gb2utf8_data = gb2utf8_char = null;
   return unescape(t.join("%"));
+}
+
+
+function obj2key(obj, keys){
+  var key=[];
+  if(keys){
+    var n = keys.length;
+    keys.forEach(function(k){
+      key.push(obj[k]);
+    });
+  }else{
+    for(var k in obj){
+      key.push(obj[k]);
+    }
+  }
+  return key.join('|');
+}
+//去重操作
+function uniqeByKeys(array,keys){
+  keys = keys?keys:false;
+  var arr = [];
+  var hash = {};
+  for (var i = 0, j = array.length; i < j; i++) {
+      var k = obj2key(array[i], keys);
+      if (!(k in hash)) {
+          hash[k] = true;
+          arr .push(array[i]);
+      }
+  }
+  return arr ;
 }
 
 
