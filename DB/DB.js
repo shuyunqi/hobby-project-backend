@@ -63,11 +63,11 @@ hobby_DB.consignee = sequelize.define('consignee',{
 hobby_DB.orderForm = sequelize.define('order_form',{
   id : {type : Sequelize.INTEGER, autoIncrement : true, primaryKey : true, unique : true},
 
-  order_account : {type : Sequelize.INTEGER, allowNull : false},
+  order_account : {type : Sequelize.STRING, allowNull : false},
   order_time : {type : Sequelize.DATE, allowNull : false},
   business : {type : Sequelize.STRING, allowNull : false},
-  shipping_method : {type : Sequelize.STRING, allowNull : false},
-
+  shipping_method : {type : Sequelize.STRING, allowNull : true},
+  status: {type : Sequelize.STRING, allowNull : false,defaultValue: 0},
   // user_id : {type : Sequelize.INTEGER, allowNull : false},
   // consignee_id : {type : Sequelize.INTEGER, allowNull : false},
   // script_id : {type : Sequelize.INTEGER, allowNull : false},
@@ -88,7 +88,6 @@ hobby_DB.user.hasMany(hobby_DB.consignee);
 hobby_DB.user.hasMany(hobby_DB.orderForm);
 hobby_DB.user.hasMany(hobby_DB.shoppingCart);
 hobby_DB.script.hasMany(hobby_DB.comment);
-hobby_DB.script.hasMany(hobby_DB.orderForm);
 hobby_DB.script.hasMany(hobby_DB.shoppingCart);
 hobby_DB.consignee.hasMany(hobby_DB.orderForm);
 
@@ -99,67 +98,67 @@ function sync(){
   for(var key in hobby_DB){
     hobby_DB[key].sync();
   }
-  hobby_DB.user.build({
-    "email": 'aa@aa.com',
-    "passwd": 'aa',
-    "lg_sign": 0,
-    "token": 'adasdsaadcaasa'
-  }).save();
-  hobby_DB.script.build({
-    name : 'book1',
-    picture : '',
-    author : 'au1',
-    pubishHouse : 'pu1',
-    pubishTime : new Date(),
-    script_tag : 'history',
-    price : 98,
-    discount : 0.46,
-    context : 'this is a book',
-  }).save();
-  hobby_DB.script.build({
-    name : 'book2',
-    picture : '',
-    author : 'au2',
-    pubishHouse : 'pu2',
-    pubishTime : new Date(),
-    script_tag : 'history',
-    price : 56,
-    discount : 0.87,
-    context : 'this is a book2',
-  }).save();
-  hobby_DB.script.build({
-    name : 'book3',
-    picture : '',
-    author : 'au3',
-    pubishHouse : 'pu3',
-    pubishTime : new Date(),
-    script_tag : 'history',
-    price : 74,
-    discount : 0.9,
-    context : 'this is a book3',
-  }).save();
-  hobby_DB.script.build({
-    name : 'book4',
-    picture : '',
-    author : 'au4',
-    pubishHouse : 'pu4',
-    pubishTime : new Date(),
-    script_tag : 'history',
-    price : 88,
-    discount : 0.86,
-    context : 'this is a book',
-  }).save();
-  hobby_DB.script.build({
-    name : 'book5',
-    picture : '',
-    author : 'au5',
-    pubishHouse : 'pu5',
-    pubishTime : new Date(),
-    script_tag : 'history',
-    price : 78,
-    discount : 0.9,
-    context : 'this is a book',
-  }).save();
+  // hobby_DB.user.build({
+  //   "email": 'aa@aa.com',
+  //   "passwd": 'aa',
+  //   "lg_sign": 0,
+  //   "token": 'adasdsaadcaasa'
+  // }).save();
+  // hobby_DB.script.build({
+  //   name : 'book1',
+  //   picture : '',
+  //   author : 'au1',
+  //   pubishHouse : 'pu1',
+  //   pubishTime : new Date(),
+  //   script_tag : 'history',
+  //   price : 98,
+  //   discount : 0.46,
+  //   context : 'this is a book',
+  // }).save();
+  // hobby_DB.script.build({
+  //   name : 'book2',
+  //   picture : '',
+  //   author : 'au2',
+  //   pubishHouse : 'pu2',
+  //   pubishTime : new Date(),
+  //   script_tag : 'history',
+  //   price : 56,
+  //   discount : 0.87,
+  //   context : 'this is a book2',
+  // }).save();
+  // hobby_DB.script.build({
+  //   name : 'book3',
+  //   picture : '',
+  //   author : 'au3',
+  //   pubishHouse : 'pu3',
+  //   pubishTime : new Date(),
+  //   script_tag : 'history',
+  //   price : 74,
+  //   discount : 0.9,
+  //   context : 'this is a book3',
+  // }).save();
+  // hobby_DB.script.build({
+  //   name : 'book4',
+  //   picture : '',
+  //   author : 'au4',
+  //   pubishHouse : 'pu4',
+  //   pubishTime : new Date(),
+  //   script_tag : 'history',
+  //   price : 88,
+  //   discount : 0.86,
+  //   context : 'this is a book',
+  // }).save();
+  // hobby_DB.script.build({
+  //   name : 'book5',
+  //   picture : '',
+  //   author : 'au5',
+  //   pubishHouse : 'pu5',
+  //   pubishTime : new Date(),
+  //   script_tag : 'history',
+  //   price : 78,
+  //   discount : 0.9,
+  //   context : 'this is a book',
+  // }).save();
 }
-// sync();
+sync();
 module.exports = hobby_DB;

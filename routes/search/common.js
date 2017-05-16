@@ -22,6 +22,7 @@ function _search_yamaxun(data){
       books.push(book);
     });
   }
+  console.log('yyyyyyyyyyyyyyyyy',data.substring(0,1000));
   return uniqeByKeys(books);
 }
 function _search_dangdang(data){
@@ -32,6 +33,7 @@ function _search_dangdang(data){
     two = getHtml(one,'li','ddt-pit');
   }
   var title = getTitle(data);
+  console.log('ttttttttttttt',data.substring(0,1000));
   console.log('rrrrrrrrrrrrr',title);
   console.log('ooooooooooooo',two[0]);
 }

@@ -3,6 +3,7 @@ var router = express.Router();
 var jwt = require('jwt-simple');
 var app = express();
 var request = require('request');
+var iconv = require('iconv-lite');
 var search = require('./search/common');
 // var DB_user = require('../DB/user');
 var hobby_DB = require('../DB/DB');
@@ -52,14 +53,14 @@ router.get('/', function(req, res, next) {
     };
     request(options, function (error, response, body) {
       // yamaxun_crawler(body)
-      var data = search.search_yamaxun(body);
+      var data;
+      if(body.length>0)
+        data = search.search_yamaxun(body);
+      console.log(data);
       res.send(data);
     });
 
-    request(dangdang_options, function (error, response, body) {
-      // yamaxun_crawler(body)
-      var data = search.search_dangdang(body);
-    });
+
   }
 });
 
@@ -116,6 +117,8 @@ function isInclude(data,test){
   else
     return false;
 }
+
+
 
 
 module.exports = router;

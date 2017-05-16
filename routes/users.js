@@ -82,6 +82,35 @@ router.put('/current',function(req,res){
   }else{
     res.send({error: 'token is not exist'})
   }
+});
+router.put('/edit',function(req,res){
+  if(req.body.token){
+    if(req.body.id=='mine'){
+      hobby_DB.user.findOne({where: {token: req.body.token }}).then(function(mine){
+        if(req.body.edit.name){
+           hobby_DB.user.update({name: req.body.edit.name},{where: {token: req.body.token }}).then(function(user){
+            hobby_DB.user.findOne({where: {token: req.body.token }}).then(function(resp){
+              res.send({
+                name:resp.name,
+                id:resp.id,
+                email:resp.email
+              });
+            })
+          })
+        }else if(req.body.edit.passwd){
+          if(mine.passwd === req.body.criteria.passwd){
+            hobby_DB.user.update({passwd: req.body.edit.passwd},{where: {token: req.body.token }}).then(function(user){
+              res.send(user);
+            })
+          }else{
+            res.send({error: 'password is not right'})
+          }
+        }
+      })
+    }
+  }else{
+    res.send({error: 'token is not exist'})
+  }
 })
 
 function user_POSTaction(options) {
