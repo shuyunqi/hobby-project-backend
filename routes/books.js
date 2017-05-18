@@ -51,8 +51,6 @@ router.post('/add', function(req, res) {
 });
 
 router.put('/delete',function(req,res){
-  console.log('aaaaaaaaaaa query',req.params)
-  console.log('aaaaaaaaaaa body',req.body)
   if(req.body.token){
     hobby_DB.script.destroy({where: { id: req.body.id,name: req.body.name }}).then(function(){
       res.send({success: "1"});

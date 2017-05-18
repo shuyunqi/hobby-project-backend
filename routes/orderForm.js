@@ -29,29 +29,135 @@ router.get('/', function(req, res, next) {
 
 router.get('/current', function(req, res, next) {
   if(req.query.token){
+    if(req.query.criteria)
+      req.query.criteria = JSON.parse(req.query.criteria);
     hobby_DB.user.findOne({ where: { token: req.query.token } }).then(function(user){
       if(user){
-        hobby_DB.orderForm.findOne({where:{userId:user.id,status:0}}).then(function(order){
-          var books = JSON.parse(order.business);
-          var order_books=[];
-          for (var i in books){
-            order_books.push(books[i]);
-          }
-          var use_books=[];
-          order_books.forEach(function(b,index){
-            hobby_DB.script.findOne({where:{id:b.id}}).then(function(book){
-              book = JSON.parse(JSON.stringify(book));
-              book.amount = b.amount;
-              use_books.push(JSON.parse(JSON.stringify(book)));
-              if(index == order_books.length-1){
-                var resp = JSON.parse(JSON.stringify(order));
-                delete resp.business;
-                resp.books = use_books;
-                res.json(resp);
-              }
-            })
+        if(req.query.type=="All"){
+          hobby_DB.orderForm.findAll({where:{userId:user.id}}).then(function(order){
+            if(order.length>0){
+              var resp=[];
+              order.forEach(function(o,index2){
+                o = JSON.parse(JSON.stringify(o))
+                var books = JSON.parse(o.business);
+                var order_books=[];
+                for (var i in books){
+                  order_books.push(books[i]);
+                }
+                var use_books=[];
+                order_books.forEach(function(b,index){
+                  hobby_DB.script.findOne({where:{id:b.id}}).then(function(book){
+                    book = JSON.parse(JSON.stringify(book));
+                    book.amount = b.amount;
+                    use_books.push(book);
+                    if(index == order_books.length-1){
+                      o.books = use_books;
+                      resp.push(o);
+                    }
+                    if(index == order_books.length-1 && index2 == order.length-1){
+                      res.send(resp);
+                    }
+                  })
+                })
+              })
+            }else{
+              res.json({});
+            }
           })
-        })
+        }
+        else if(req.query.type=="admin"){
+          if(user.level == 0){
+            hobby_DB.orderForm.findAll({where:{}}).then(function(order){
+              var resp=[];
+              order.forEach(function(o,index2){
+                o = JSON.parse(JSON.stringify(o))
+                var books = JSON.parse(o.business);
+                var order_books=[];
+                for (var i in books){
+                  order_books.push(books[i]);
+                }
+                var use_books=[];
+                var use_user = {};
+                if(user.name)
+                  use_user.name = user.name;
+                if(user.email)
+                  use_user.email = user.email;
+                o.user = use_user;
+                order_books.forEach(function(b,index){
+                  hobby_DB.script.findOne({where:{id:b.id}}).then(function(book){
+                    book = JSON.parse(JSON.stringify(book));
+                    book.amount = b.amount;
+                    use_books.push(book);
+                    if(index == order_books.length-1){
+                      o.books = use_books;
+                      resp.push(o);
+                    }
+                    if(index == order_books.length-1 && index2 == order.length-1){
+                      res.send(resp);
+                    }
+                  })
+                })
+              })
+            })
+          }
+        }
+        else if(req.query.criteria.order_account){
+          hobby_DB.orderForm.findOne({where:{userId:user.id,order_account:req.query.criteria.order_account}}).then(function(order){
+            if(order){
+              var books = JSON.parse(order.business);
+              var order_books=[];
+              for (var i in books){
+                order_books.push(books[i]);
+              }
+              var use_books=[];
+              order_books.forEach(function(b,index){
+                hobby_DB.script.findOne({where:{id:b.id}}).then(function(book){
+                  book = JSON.parse(JSON.stringify(book));
+                  book.amount = b.amount;
+                  use_books.push(JSON.parse(JSON.stringify(book)));
+                  if(index == order_books.length-1){
+                    var resp = JSON.parse(JSON.stringify(order));
+                    delete resp.business;
+                    resp.books = use_books;
+                    res.json(resp);
+                  }
+                })
+              })
+            }
+            else{
+              res.json({});
+            }
+          })
+        }
+        else{
+          hobby_DB.orderForm.findOne({where:{userId:user.id,status:0}}).then(function(order){
+            if(order){
+              var books = JSON.parse(order.business);
+              var order_books=[];
+              for (var i in books){
+                order_books.push(books[i]);
+              }
+              var use_books=[];
+              order_books.forEach(function(b,index){
+                hobby_DB.script.findOne({where:{id:b.id}}).then(function(book){
+                  book = JSON.parse(JSON.stringify(book));
+                  book.amount = b.amount;
+                  use_books.push(JSON.parse(JSON.stringify(book)));
+                  if(index == order_books.length-1){
+                    var resp = JSON.parse(JSON.stringify(order));
+                    delete resp.business;
+                    resp.books = use_books;
+                    res.json(resp);
+                  }
+                })
+              })
+            }
+            else{
+              res.json({});
+            }
+          })
+        }
+
       }else{
         res.send({token: 'token is not right'})
       }
@@ -79,14 +185,56 @@ router.put('/make',function(req,res){
         userId: user.id,
         status: 0,
         business: JSON.stringify(books)
-      }).then(function(){
-        res.send({success:1});
+      }).then(function(order){
+        res.send(order);
       })
     })
   }else{
     res.send({error: 'token is not exist'})
   }
 });
+
+router.put('/update',function(req,res){
+  if(req.body.token){
+    hobby_DB.user.findOne({where:{token: req.body.token}}).then(function(user){
+      hobby_DB.orderForm.update({
+        shipping_method: req.body.shipping_method,
+        status: 1,
+        consigneeId: req.body.consignee.id
+      },{
+        where:{
+          order_account: req.body.orderForm[0].order_account
+        }
+      }).then(function(order){
+        hobby_DB.orderForm.findOne({where:{order_account: req.body.orderForm[0].order_account}}).then(function(order){
+          res.send(order);
+        })
+      })
+    });
+  }else{
+    res.send({error: 'token is not exist'})
+  }
+});
+router.put('/pay',function(req,res){
+  if(req.body.token){
+    hobby_DB.user.findOne({where:{token: req.body.token}}).then(function(user){
+      hobby_DB.orderForm.update({
+        status: 2,
+      },{
+        where:{
+          order_account: req.body.orderForm[0].order_account
+        }
+      }).then(function(){
+        hobby_DB.orderForm.findOne({where:{order_account: req.body.orderForm[0].order_account}}).then(function(order){
+          res.send(order);
+        })
+      })
+    });
+  }else{
+    res.send({error: 'token is not exist'})
+  }
+});
+
 
 function makeAccount(user){
   var timestamp = Date.parse(new Date());

@@ -16,6 +16,7 @@ router.get('/current', function(req, res, next) {
         name: user.name,
         id: user.id,
         email: user.email,
+        level: user.level
       }
       res.json(response);
     }else{

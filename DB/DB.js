@@ -14,6 +14,7 @@ hobby_DB.user = sequelize.define('user', {
   passwd : {type : Sequelize.STRING, allowNull : false},
   lg_sign : {type : Sequelize.BOOLEAN, defaultValue : 0},
   login_time : {type : Sequelize.DATE, allowNull : true},
+  level: {type : Sequelize.INTEGER, allowNull : true,defaultValue: 1},
   token : {type : Sequelize.STRING, allowNull : true},
   // default value
   deadline : {type : Sequelize.DATE, defaultValue : Sequelize.NOW}
@@ -53,7 +54,7 @@ hobby_DB.consignee = sequelize.define('consignee',{
   name : {type : Sequelize.STRING, allowNull : true},
   address : {type : Sequelize.STRING, allowNull : false},
   postcode : {type : Sequelize.INTEGER, allowNull : false},
-  phone : {type : Sequelize.INTEGER, allowNull : false},
+  phone : {type : Sequelize.STRING, allowNull : false},
 
   // user_id : {type : Sequelize.INTEGER, allowNull : false},
 
@@ -70,7 +71,6 @@ hobby_DB.orderForm = sequelize.define('order_form',{
   status: {type : Sequelize.STRING, allowNull : false,defaultValue: 0},
   // user_id : {type : Sequelize.INTEGER, allowNull : false},
   // consignee_id : {type : Sequelize.INTEGER, allowNull : false},
-  // script_id : {type : Sequelize.INTEGER, allowNull : false},
 
   deadline : {type : Sequelize.DATE, defaultValue : Sequelize.NOW}
 });
@@ -102,6 +102,7 @@ function sync(){
   //   "email": 'aa@aa.com',
   //   "passwd": 'aa',
   //   "lg_sign": 0,
+  //   "level": 0,
   //   "token": 'adasdsaadcaasa'
   // }).save();
   // hobby_DB.script.build({

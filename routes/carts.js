@@ -46,15 +46,31 @@ router.put('/add', function(req, res, next) {
     if(req.body.userId && req.body.bookId){
       hobby_DB.shoppingCart.findOne({ where: { userId:req.body.userId ,scriptId: req.body.bookId}}).then(function(have){
         if(!have || have.length==0){
-          hobby_DB.shoppingCart.build({
+          hobby_DB.shoppingCart.create({
             amount: req.body.amount?req.body.amount:1,
             userId: req.body.userId,
             scriptId: req.body.bookId
-          }).save();
+          }).then(function(){
+            hobby_DB.script.findOne({ where: {id: req.body.bookId}}).then(function(book){
+              book = JSON.parse(JSON.stringify(book));
+              book.amount = req.body.amount?req.body.amount:1;
+              res.json(book)
+            })
+          });
         }
-        res.json({success: 1})
       })
     }
+  }else{
+    res.json({error: 'token is not exist'})
+  }
+});
+router.put('/delete', function(req, res, next) {
+  if(req.body.token){
+    hobby_DB.user.findOne({ where: { token: req.body.token }}).then(function(user){
+      hobby_DB.shoppingCart.destroy({ where: { id:req.body.cartId ,userId: user.id}}).then(function(have){
+        res.json({id: req.body.cartId})
+      })
+    })
   }else{
     res.json({error: 'token is not exist'})
   }

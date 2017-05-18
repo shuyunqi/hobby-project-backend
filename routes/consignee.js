@@ -35,11 +35,31 @@ router.put('/add',function(req,res){
         phone: req.body.phone,
         userId: user.id
       }).then(function(resp){
-        res.send(resp);
+        hobby_DB.consignee.findOne({where:{
+          name: req.body.name,
+          address: req.body.address,
+          postcode: '214122',
+          phone: req.body.phone,
+          userId: user.id
+        }}).then(function(con){
+          res.send(con);
+        })
       })
     });
   }else{
     res.send({error: 'token is not exist'})
+  }
+});
+
+router.put('/delete', function(req, res, next) {
+  if(req.body.token){
+    hobby_DB.user.findOne({ where: { token: req.body.token }}).then(function(user){
+      hobby_DB.consignee.destroy({ where: { id:req.body.consigneeId ,userId: user.id}}).then(function(have){
+        res.json({id: req.body.consigneeId})
+      })
+    })
+  }else{
+    res.json({error: 'token is not exist'})
   }
 });
 
