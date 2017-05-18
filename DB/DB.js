@@ -33,6 +33,7 @@ hobby_DB.script = sequelize.define('script',{
   price : {type : Sequelize.INTEGER, allowNull : false},
   discount : {type : Sequelize.STRING, allowNull : true},
   context : {type : Sequelize.STRING, allowNull : true},
+  store: {type : Sequelize.INTEGER, allowNull : true},
   // default value
   deadline : {type : Sequelize.DATE, defaultValue : Sequelize.NOW}
 });
@@ -115,6 +116,7 @@ function sync(){
   //   price : 98,
   //   discount : 0.46,
   //   context : 'this is a book',
+  //   store: 999
   // }).save();
   // hobby_DB.script.build({
   //   name : 'book2',
@@ -126,6 +128,7 @@ function sync(){
   //   price : 56,
   //   discount : 0.87,
   //   context : 'this is a book2',
+  //   store: 999
   // }).save();
   // hobby_DB.script.build({
   //   name : 'book3',
@@ -137,6 +140,7 @@ function sync(){
   //   price : 74,
   //   discount : 0.9,
   //   context : 'this is a book3',
+  //   store: 999
   // }).save();
   // hobby_DB.script.build({
   //   name : 'book4',
@@ -148,6 +152,7 @@ function sync(){
   //   price : 88,
   //   discount : 0.86,
   //   context : 'this is a book',
+  //   store: 999
   // }).save();
   // hobby_DB.script.build({
   //   name : 'book5',
@@ -159,7 +164,8 @@ function sync(){
   //   price : 78,
   //   discount : 0.9,
   //   context : 'this is a book',
+  //   store: 999
   // }).save();
 }
-sync();
+// sync();
 module.exports = hobby_DB;

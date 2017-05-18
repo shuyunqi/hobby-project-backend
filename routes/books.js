@@ -16,6 +16,10 @@ router.get('/current', function(req, res, next) {
     hobby_DB.script.findOne({ where: { id: req.query.id }}).then(function(script){
       res.json(JSON.parse(JSON.stringify(script)));
     })
+  }else if(req.query.tag){
+    hobby_DB.script.findAll({ where: { script_tag: req.query.tag }}).then(function(script){
+      res.json(JSON.parse(JSON.stringify(script)));
+    })
   }
 });
 
@@ -50,6 +54,27 @@ router.post('/add', function(req, res) {
   }
 });
 
+router.put('/edit',function(req,res){
+  if(req.body.token){
+    hobby_DB.user.findOne({where:{token: req.body.token}}).then(function(user){
+      if(user.level == 0){
+        hobby_DB.script.update(req.body.data,{where:{id:req.body.data.id}}).then(function(s){
+          if(s[0]==1){
+            hobby_DB.script.findOne({where:{id:req.body.data.id}}).then(function(script){
+              res.send(JSON.parse(JSON.stringify(script)));
+            })
+          }
+        })
+      }else{
+        res.send({error: 'you are not admin!'})
+      }
+    })
+  }else{
+    res.send({error: 'token'})
+  }
+})
+
+
 router.put('/delete',function(req,res){
   if(req.body.token){
     hobby_DB.script.destroy({where: { id: req.body.id,name: req.body.name }}).then(function(){
@@ -59,5 +84,6 @@ router.put('/delete',function(req,res){
     res.send({error: 'token'})
   }
 })
+
 
 module.exports = router;

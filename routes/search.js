@@ -51,14 +51,19 @@ router.get('/', function(req, res, next) {
         'cache-control': 'no-cache'
       }
     };
-    request(options, function (error, response, body) {
-      // yamaxun_crawler(body)
-      var data;
-      if(body.length>0)
-        data = search.search_yamaxun(body);
-      console.log(data);
-      res.send(data);
-    });
+    function searchYamaxun(options){
+      request(options, function (error, response, body) {
+        if(body.length>0){
+          data = search.search_yamaxun(body);
+          if(data.length>0)
+            res.send(data);
+          else
+            searchYamaxun(options);
+        }
+      });
+    }
+    searchYamaxun(options);
+
 
 
   }

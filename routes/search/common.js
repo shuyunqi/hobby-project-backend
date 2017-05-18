@@ -18,6 +18,8 @@ function _search_yamaxun(data){
       var time = getContext(o,'span','a-size-small');
       var author = getContext(o,'span','a-size-small',2);
       var price = getContext(o,'span','a-size-base');
+      if(price.indexOf('￥')>=0)
+        price = price.substring(1);
       var book = new _book(name,time,author,price,img);
       books.push(book);
     });
