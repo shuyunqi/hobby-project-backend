@@ -71,30 +71,32 @@ router.get('/current', function(req, res, next) {
               var resp=[];
               order.forEach(function(o,index2){
                 o = JSON.parse(JSON.stringify(o))
-                var books = JSON.parse(o.business);
-                var order_books=[];
-                for (var i in books){
-                  order_books.push(books[i]);
-                }
-                var use_books=[];
-                var use_user = {};
-                if(user.name)
-                  use_user.name = user.name;
-                if(user.email)
-                  use_user.email = user.email;
-                o.user = use_user;
-                order_books.forEach(function(b,index){
-                  hobby_DB.script.findOne({where:{id:b.id}}).then(function(book){
-                    book = JSON.parse(JSON.stringify(book));
-                    book.amount = b.amount;
-                    use_books.push(book);
-                    if(index == order_books.length-1){
-                      o.books = use_books;
-                      resp.push(o);
-                    }
-                    if(index == order_books.length-1 && index2 == order.length-1){
-                      res.send(resp);
-                    }
+                hobby_DB.user.findOne({where:{id:o.userId}}).then(function(user){
+                  var order_user = {};
+                  if(user){
+                    order_user.name = user.name? user.name:'';
+                    order_user.email = user.email;
+                    o.user = order_user;
+                  }
+                  var books = JSON.parse(o.business);
+                  var order_books=[];
+                  for (var i in books){
+                    order_books.push(books[i]);
+                  }
+                  var use_books=[];
+                  order_books.forEach(function(b,index){
+                    hobby_DB.script.findOne({where:{id:b.id}}).then(function(book){
+                      book = JSON.parse(JSON.stringify(book));
+                      book.amount = b.amount;
+                      use_books.push(book);
+                      if(index == order_books.length-1){
+                        o.books = use_books;
+                        resp.push(o);
+                      }
+                      if(index == order_books.length-1 && index2 == order.length-1){
+                        res.send(resp);
+                      }
+                    })
                   })
                 })
               })
@@ -226,8 +228,27 @@ router.put('/pay',function(req,res){
         }
       }).then(function(){
         hobby_DB.orderForm.findOne({where:{order_account: req.body.orderForm[0].order_account}}).then(function(order){
-          res.send(order);
+          order = JSON.parse(JSON.stringify(order));
+          req.body.orderForm[0].books.forEach(function(b,key){
+            hobby_DB.script.update({store:b.store-b.amount},{where:{id:b.id}}).then(function(have){
+              if(key == req.body.orderForm[0].books.length-1){
+                res.send(order);
+              }
+            })
+          })
         })
+      })
+    });
+  }else{
+    res.send({error: 'token is not exist'})
+  }
+});
+
+router.put('/delete',function(req,res){
+  if(req.body.token){
+    hobby_DB.user.findOne({where:{token: req.body.token}}).then(function(user){
+      hobby_DB.orderForm.destroy({where:{order_account: req.body.order_account }}).then(function(){
+        res.send({order_account:req.body.order_account});
       })
     });
   }else{

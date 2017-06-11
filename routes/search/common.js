@@ -21,23 +21,20 @@ function _search_yamaxun(data){
       if(price.indexOf('￥')>=0)
         price = price.substring(1);
       var book = new _book(name,time,author,price,img);
-      books.push(book);
+      if(book.price&&book.price!='0.00'&&book.name){
+        books.push(book);
+      }
     });
   }
-  console.log('yyyyyyyyyyyyyyyyy',data.substring(0,1000));
   return uniqeByKeys(books);
 }
 function _search_dangdang(data){
-
   var one,two=[];
   one = cut(data,'search_nature_rg','<script>');
   if(one.length>0 && typeof one == 'string'){
     two = getHtml(one,'li','ddt-pit');
   }
   var title = getTitle(data);
-  console.log('ttttttttttttt',data.substring(0,1000));
-  console.log('rrrrrrrrrrrrr',title);
-  console.log('ooooooooooooo',two[0]);
 }
 
 function _book(name,time,author,price,img){

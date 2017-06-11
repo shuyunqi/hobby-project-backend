@@ -8,7 +8,7 @@ var hobby_DB = require('../DB/DB');
 var sequelize = require('../DB/connect');
 
 router.get('/current', function(req, res, next) {
-  if(req.query.type == 'All'){
+  if(req.query.type === 'All'){
     hobby_DB.script.findAll().then(function(script){
       res.json(JSON.parse(JSON.stringify(script)));
     })

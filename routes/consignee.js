@@ -14,15 +14,23 @@ router.get('/', function(req, res, next) {
 router.get('/current', function(req, res, next) {
   // console.log(req.query);
   // var request = JSON.parse(req.query);
-  hobby_DB.user.findOne({ where: { token: req.query.token } }).then(function(user){
-    hobby_DB.consignee.findAll({where: { userId: user.id}}).then(function(consignees){
-      if(consignees){
-        res.json(consignees);
+  if(req.query.token){
+    hobby_DB.user.findOne({ where: { token: req.query.token } }).then(function(user){
+      if(user){
+        hobby_DB.consignee.findAll({where: { userId: user.id}}).then(function(consignees){
+          if(consignees){
+            res.json(consignees);
+          }else{
+            res.send({token: 'token is not right'})
+          }
+        })
       }else{
-        res.send({token: 'token is not right'})
+        res.send({error: 'no login'});
       }
     })
-  })
+  }else{
+    res.send({error: 'token is not exist'});
+  }
 });
 
 router.put('/add',function(req,res){

@@ -67,9 +67,25 @@ router.put('/add', function(req, res, next) {
 router.put('/delete', function(req, res, next) {
   if(req.body.token){
     hobby_DB.user.findOne({ where: { token: req.body.token }}).then(function(user){
-      hobby_DB.shoppingCart.destroy({ where: { id:req.body.cartId ,userId: user.id}}).then(function(have){
-        res.json({id: req.body.cartId})
-      })
+
+      if(req.body.cartId){
+        hobby_DB.shoppingCart.destroy({ where: { scriptId:req.body.cartId ,userId: user.id}}).then(function(have){
+          res.json({id: req.body.cartId})
+        })
+      }
+      else if(req.body.cartIds){
+        var respon_data = [];
+        req.body.cartIds.forEach(function(id,key){
+          hobby_DB.shoppingCart.destroy({ where: { scriptId:id ,userId: user.id}}).then(function(have){
+            respon_data.push({id:id});
+            if(key==req.body.cartIds.length-1){
+              res.json(respon_data);
+            }
+          })
+        })
+      }else{
+        res.send({error: 'params wrong'});
+      }
     })
   }else{
     res.json({error: 'token is not exist'})

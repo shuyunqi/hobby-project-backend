@@ -10,15 +10,28 @@ var sequelize = require('../DB/connect');
 router.get('/current', function(req, res, next) {
   // console.log(req.query);
   // var request = JSON.parse(req.query);
+
   hobby_DB.user.findOne({ where: { token: req.query.token } }).then(function(user){
     if(user){
-      var response ={
-        name: user.name,
-        id: user.id,
-        email: user.email,
-        level: user.level
+      if(req.query.type === 'All'){
+        if(user.level === 0){
+          hobby_DB.user.findAll({where:{}}).then(function(users){
+            res.send(users);
+          })
+        }else{
+          res.send({error: 'no Permission'});
+        }
       }
-      res.json(response);
+      else{
+        hobby_DB.user.update({lg_sign:true},{where:{token: req.query.token}})
+        var response ={
+          name: user.name,
+          id: user.id,
+          email: user.email,
+          level: user.level
+        }
+        res.json(response);
+      }
     }else{
       res.send({token: 'token is not right'})
     }
@@ -56,6 +69,7 @@ router.post('/login',function(req,res){
     hobby_DB.user.findOne({ where: { email: req.body.email } }).then(function(user){
       if(user && user.email){
         if(req.body.passwd === user.passwd){
+          hobby_DB.user.update({lg_sign:true},{where:{email: req.body.email}})
           res.send({ token: user.token })
         }else{
           res.send({error: 'passwd'})
@@ -109,6 +123,25 @@ router.put('/edit',function(req,res){
         }
       })
     }
+  }else{
+    res.send({error: 'token is not exist'})
+  }
+})
+
+router.put('/delete',function(req,res){
+  if(req.body.token){
+    hobby_DB.user.findOne({where:{token: req.body.token}}).then(function(user){
+      if(user.level === 0){
+        hobby_DB.user.destroy({where:{id:req.body.userId}}).then(function(){
+          res.send({userId: req.body.userId});
+        })
+        hobby_DB.consignee.destroy({where:{userId:req.body.userId}});
+        hobby_DB.orderForm.destroy({where:{userId:req.body.userId}});
+      }
+      else{
+        res.send({error: 'no Permission'})
+      }
+    })
   }else{
     res.send({error: 'token is not exist'})
   }

@@ -57,8 +57,11 @@ router.get('/', function(req, res, next) {
           data = search.search_yamaxun(body);
           if(data.length>0)
             res.send(data);
-          else
-            searchYamaxun(options);
+          else{
+            setTimeout(function(){
+              searchYamaxun(options);
+            },0)
+          }
         }
       });
     }
